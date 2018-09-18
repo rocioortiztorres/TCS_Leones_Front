@@ -7,9 +7,9 @@ class AR_buscarRecibo extends React.Component {
     constructor (props){
         super(props);
         this.state = {
-            //numRecibo: this.props.recibo,
             dataRecaudaciones: [],
-            buscar: false
+            numRecibo: '',
+            formulario: false
         };
 
         this.formAlumno = this.formAlumno.bind(this);
@@ -17,13 +17,14 @@ class AR_buscarRecibo extends React.Component {
 
     formAlumno = (e) => {
         e.preventDefault();
-        this.setState({
-            buscar: true
-        });
-        console.log('--------Datos-------');
-        console.log(this.props.asignar);
-        console.log(this.props.tabla);
-        console.log(this.props.recibo);
+        for(var i in this.state.dataRecaudaciones){
+            if(this.props.recibo == this.state.dataRecaudaciones[i].numero){;
+                this.setState({
+                    numRecibo: this.state.dataRecaudaciones[i].numero,
+                    formulario: true
+                });
+            }
+        }
     }
 
     render(){
@@ -37,7 +38,7 @@ class AR_buscarRecibo extends React.Component {
                             </button>
                         </div>
                         <div>
-                        {this.state.buscar?(
+                        {this.state.formulario?(
                             <div className="center datos">
                                 <h4 className="center h4">
                                     <b>Buscar alumno</b>
@@ -46,7 +47,8 @@ class AR_buscarRecibo extends React.Component {
                                     <input className="autocomplete" onChange={this.handleChangeDni} placeholder="DNI"></input>
                                     <input className="autoomplete" onChange={this.handleChangeCodigo} placeholder="Código"></input>
                                     <input className="autocomplete" onChange={this.handleChangeApePaterno} placeholder="Apellido paterno"></input>
-                                    <input className="autocomplete" onChange={this.handleChangeApeMaterno} placeholder="Apellido Materno"></input>                                                <input className="autocomplete" onChange={this.handleChangeNombres} placeholder="Nombres"></input>
+                                    <input className="autocomplete" onChange={this.handleChangeApeMaterno} placeholder="Apellido Materno"></input>                                                
+                                    <input className="autocomplete" onChange={this.handleChangeNombres} placeholder="Nombres"></input>
                                     <button className="waves-effect waves-light btn-large center" type="submit">
                                         Buscar <i className="large material-icons left">search</i>
                                     </button>
@@ -70,7 +72,7 @@ class AR_buscarRecibo extends React.Component {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="td">{this.state.dataRecaudaciones.numero}</td>
+                                    <td className="td">{this.state.numRecibo}</td>
                                     <td className="td"></td>
                                     <td className="td"></td>
                                     <td className="td"></td>
@@ -94,11 +96,6 @@ class AR_buscarRecibo extends React.Component {
 
     componentDidMount() {
         //Json para buscar número de recio
-        //var neoRec = this.state.numRecibo;
-        console.log('--------FETCH------');
-        console.log(this.props.recibo);
-        console.log(this.props.asignar);
-        console.log(this.props.tabla);
         fetch(CONFIG + '/recaudaciones/rec/' + this.props.recibo)
         .then((response) => {
             console.log("----------------");
@@ -110,7 +107,9 @@ class AR_buscarRecibo extends React.Component {
             console.log(recaudaciones);
             this.setState({
                 dataRecaudaciones: recaudaciones
-            })
+            });
+            console.log('----DR-----');
+            console.log(this.state.dataRecaudaciones);
         })
         .catch((error) => {
             console.log("----ERROR----")
