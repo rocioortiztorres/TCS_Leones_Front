@@ -1,5 +1,6 @@
 import React from 'react'
 import '../App.css';
+import swal from 'sweetalert'
 import CONFIG from '../Configuracion/Config';
 
 class AR_buscarRecibo extends React.Component {
@@ -7,9 +8,13 @@ class AR_buscarRecibo extends React.Component {
     constructor (props){
         super(props);
         this.state = {
+            //data de recibo
             dataRecaudaciones: [],
             numRecibo: '',
-            formulario: false
+            formulario: false,
+            //data de alumno
+            dataAlumnos: [],
+            alumDNI: '',
         };
 
         this.formAlumno = this.formAlumno.bind(this);
@@ -25,6 +30,16 @@ class AR_buscarRecibo extends React.Component {
                 });
             }
         }
+    }
+
+    buscarAlumno = (e) =>{
+        swal("Another one bites the dust", "", "success");
+    }
+
+    handleChangeDni = (e) => {
+        this.setState({
+            alumDNI: e.target.value
+        });
     }
 
     render(){
@@ -49,7 +64,7 @@ class AR_buscarRecibo extends React.Component {
                                     <input className="autocomplete" onChange={this.handleChangeApePaterno} placeholder="Apellido paterno"></input>
                                     <input className="autocomplete" onChange={this.handleChangeApeMaterno} placeholder="Apellido Materno"></input>                                                
                                     <input className="autocomplete" onChange={this.handleChangeNombres} placeholder="Nombres"></input>
-                                    <button className="waves-effect waves-light btn-large center" type="submit">
+                                    <button className="waves-effect waves-light btn-large center" type="submit" onClick={this.buscarAlumno}>
                                         Buscar <i className="large material-icons left">search</i>
                                     </button>
                                 </div>
@@ -96,23 +111,32 @@ class AR_buscarRecibo extends React.Component {
 
     componentDidMount() {
         //Json para buscar número de recio
-        fetch(CONFIG + '/recaudaciones/rec/' + this.props.recibo)
+        fetch(CONFIG + 'recaudaciones/rec/' + this.props.recibo)
         .then((response) => {
-            console.log("----------------");
-            console.log("entró");
             return response.json();
         })
         .then((recaudaciones) =>{
-            console.log("------------------------------");
-            console.log(recaudaciones);
             this.setState({
                 dataRecaudaciones: recaudaciones
             });
-            console.log('----DR-----');
-            console.log(this.state.dataRecaudaciones);
+            swal("Recibo encontrado", "", "success");
         })
         .catch((error) => {
-            console.log("----ERROR----")
+            console.error(error)
+        });
+
+        //Json para buscar al alumno por dni
+        fetch(CONFIG + 'alumnoprograma/buscard/' + this.state.alumDNI)
+        .then((response) => {
+            return response.json();
+        })
+        .then((alumnos) => {
+            this.setState({
+                dataAlumnos: alumnos
+            });
+            swal("Alumno encontrado", "", "success");
+        })
+        .catch((error) => {
             console.error(error)
         });
     }

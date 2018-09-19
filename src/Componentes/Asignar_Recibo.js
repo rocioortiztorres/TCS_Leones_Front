@@ -1,7 +1,7 @@
 import React from 'react'
 import '../App.css';
 import {browserHistory} from 'react-router-3';
-import CONFIG from '../Configuracion/Config';
+import swal from 'sweetalert'
 import AR_buscarRecibo from './AR_buscarRecibo';
 
 class Asignar_Recibo extends React.Component {
@@ -28,7 +28,7 @@ class Asignar_Recibo extends React.Component {
             this.setState({
                 asignar: false,
             });
-            alert("Ingrese el numero de recibo a buscar");
+            swal("Ingrese el numero de recibo", "", "error");
         } else{
             this.setState({
                 asignar: true,
