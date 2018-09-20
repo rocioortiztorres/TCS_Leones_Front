@@ -27,6 +27,7 @@ class Asignar_Recibo extends React.Component {
         if(this.state.rec == ''){
             this.setState({
                 asignar: false,
+                tabla: false
             });
             swal("Ingrese el numero de recibo", "", "error");
         } else{

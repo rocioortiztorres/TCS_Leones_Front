@@ -2,22 +2,36 @@ import React from 'react'
 import '../App.css';
 import swal from 'sweetalert'
 import CONFIG from '../Configuracion/Config';
+import AR_buscarAlumno from './AR_buscarAlumno';
 
 class AR_buscarRecibo extends React.Component {
 
     constructor (props){
         super(props);
         this.state = {
+            //Activadores
+            tabla: this.props.tabla,
+            asignar: this.props.asignar,
+            flag: false,
             //data de recibo
             dataRecaudaciones: [],
             numRecibo: '',
             formulario: false,
             //data de alumno
-            dataAlumnos: [],
-            alumDNI: '',
+            dni: '',
+            codigo: '',
+            apePat: '',
+            apeMat: '',
+            nombre: ''
         };
 
         this.formAlumno = this.formAlumno.bind(this);
+        this.buscarAlumno = this.buscarAlumno.bind(this);
+        this.handleChangeDni = this.handleChangeDni.bind(this);
+        this.handleChangeCodigo = this.handleChangeCodigo.bind(this);
+        this.handleChangeApePaterno = this.handleChangeApePaterno.bind(this);
+        this.handleChangeApeMaterno = this.handleChangeApeMaterno.bind(this);
+        this.handleChangeNombres = this.handleChangeNombres.bind(this);
     }
 
     formAlumno = (e) => {
@@ -26,26 +40,64 @@ class AR_buscarRecibo extends React.Component {
             if(this.props.recibo == this.state.dataRecaudaciones[i].numero){;
                 this.setState({
                     numRecibo: this.state.dataRecaudaciones[i].numero,
-                    formulario: true
+                    formulario: true,
                 });
             }
         }
     }
 
     buscarAlumno = (e) =>{
-        swal("Another one bites the dust", "", "success");
+        e.preventDefault();
+        if(this.state.dni == '' && this.state.codigo == '' && this.state.apePat == '' && this.state.apeMat == '' && this.state.nombre == ''){
+            this.setState({
+                tabla: true,
+                asignar: true,
+                flag: false
+            })
+            swal("Ingrese un dato para buscar al alumno", "", "error");
+        } else{
+            this.setState({
+                tabla: false,
+                asignar: false,
+                flag: true
+            });
+        }
     }
 
     handleChangeDni = (e) => {
         this.setState({
-            alumDNI: e.target.value
+            dni: e.target.value
+        });
+    }
+
+    handleChangeCodigo = (e) =>{
+        this.setState({
+            codigo: e.target.value
+        });
+    } 
+
+    handleChangeApePaterno = (e) =>{
+        this.setState({
+            apePat: e.target.value
+        });
+    }
+
+    handleChangeApeMaterno = (e) =>{
+        this.setState({
+            apeMat: e.target.apeMat
+        });
+    }
+
+    handleChangeNombres = (e) =>{
+        this.setState({
+            nombre: e.target.value
         });
     }
 
     render(){
         return(
             <div className="center datos">
-                {this.props.asignar?(
+                {this.state.asignar?(
                     <div className="center datos">
                         <div>
                             <button className="waves-effect waves-light btn-large center" type="submit" onClick={this.formAlumno}>
@@ -74,7 +126,7 @@ class AR_buscarRecibo extends React.Component {
                     </div>
                 ): (null)}
 
-                {this.props.tabla?(
+                {this.state.tabla?(
                     <div className="center datos">
                         <table className="table">
                             <thead>
@@ -105,6 +157,18 @@ class AR_buscarRecibo extends React.Component {
                         </button>
                     </div>
                 ): (null)}
+
+                {this.state.flag?(
+                    <AR_buscarAlumno 
+                        tabla={this.state.tabla} 
+                        numRecibo={this.state.numRecibo} 
+                        dniAlum={this.state.dni} 
+                        codAlum={this.state.codigo} 
+                        apePatAlum={this.state.apePat} 
+                        apeMatAlum={this.state.apeMat} 
+                        nomAlum={this.state.nombre}>
+                    </AR_buscarAlumno>
+                ): (null)}
             </div>
         )
     }
@@ -120,21 +184,6 @@ class AR_buscarRecibo extends React.Component {
                 dataRecaudaciones: recaudaciones
             });
             swal("Recibo encontrado", "", "success");
-        })
-        .catch((error) => {
-            console.error(error)
-        });
-
-        //Json para buscar al alumno por dni
-        fetch(CONFIG + 'alumnoprograma/buscard/' + this.state.alumDNI)
-        .then((response) => {
-            return response.json();
-        })
-        .then((alumnos) => {
-            this.setState({
-                dataAlumnos: alumnos
-            });
-            swal("Alumno encontrado", "", "success");
         })
         .catch((error) => {
             console.error(error)
