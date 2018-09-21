@@ -20,10 +20,10 @@ class Asignar_Recibo extends React.Component {
             //Variables para la búsqueda del alumno
             formulario: false,
             dni: '', 
-            codigo: '', codAlum: '',
+            codigo: '', codAlum: [],
             apePat: '', 
             apeMat: '',
-            nombre: '', nomAlum: '',
+            nombre: '', nomAlum: [],
             dataAlumno: []
         };
 
@@ -40,7 +40,7 @@ class Asignar_Recibo extends React.Component {
                 asignar: false,
                 tabla: false
             });
-            swal("Ingrese el numero de recibo", "", "error");
+            swal("Ingrese el numero de recibo", "", "warning");
         } else{
             for(var i in this.state.dataRecaudaciones){
                 if(this.state.rec == this.state.dataRecaudaciones[i].numero){
@@ -78,19 +78,34 @@ class Asignar_Recibo extends React.Component {
 
     buscarAlumno = (e) =>{
         e.preventDefault();
+        let aCod = [];
+        let aNom = [];
         if(this.state.dni == '' && this.state.codigo == '' && this.state.apePat == '' && this.state.apeMat == '' && this.state.nombre == ''){
             this.setState({
                 tabla: true,
                 asignar: true,
                 flag: false
-            })
-            swal("Ingrese un dato para buscar al alumno", "", "error");
-        } else{
-            this.setState({
-                tabla: false,
-                asignar: false,
-                flag: true
             });
+            swal("Ingrese un dato para buscar al alumno", "", "warning");
+        } else if(this.state.dni != ''){
+            for(var i in this.state.dataAlumno){
+                if(this.state.dni == this.state.dataAlumno[i]){
+                    aCod[i] = this.state.dataAlumno[i].codAlumno;
+                    aNom[i] = this.state.dataAlumno[i].nomAlumno + " " + this.state.dataAlumno[i].apePaterno + " " + this.state.dataAlumno[i].apeMaterno;
+                    this.setState({
+                        asignar: false
+                    });
+                } else{
+                    swal("DNI no existente, intente buscar mediante otro campo", "", "error");
+                }
+            }
+            if(aCod.length > 0 && aNom.length > 0){
+                swal("Alumno encontrado", "", "success");
+                this.setState({
+                    codAlum: aCod,
+                    nomAlum: aNom
+                });
+            }
         }
     }
 
@@ -242,16 +257,15 @@ class Asignar_Recibo extends React.Component {
             console.error(error)
         });
 
-        //Json para buscar número de recio
-        fetch(CONFIG + 'recaudaciones/rec/' + this.state.dni)
+        //Json para buscar al alumno por dni
+        fetch(CONFIG + 'alumnoprograma/buscard/' + this.state.dni)
         .then((response) => {
             return response.json();
         })
-        .then((recaudaciones) =>{
+        .then((alumnos) => {
             this.setState({
-                dataRecaudaciones: recaudaciones
+                dataAlumnos: alumnos
             });
-            swal("Recibo encontrado", "", "success");
         })
         .catch((error) => {
             console.error(error)
