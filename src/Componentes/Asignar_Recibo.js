@@ -1,6 +1,7 @@
 import React from 'react'
 import '../App.css';
 import {browserHistory} from 'react-router-3';
+import CONFIG from '../Configuracion/Config';
 import swal from 'sweetalert'
 import AR_buscarRecibo from './AR_buscarRecibo';
 
@@ -13,7 +14,8 @@ class Asignar_Recibo extends React.Component {
             asignar:false, //Variable para habilitar el botón asigar a
             tabla:false,  //Variable para habilitar la tabla
             flag: false, //Variable para hacer una pausar y poder pasar el parámetro rec
-            rec: '', //Variable para la solicitud
+            rec: '', //Variable para la solicitud del recibo
+            dataRecaudaciones: []
         };
 
         this.Regresar = this.Regresar.bind(this);
@@ -31,11 +33,18 @@ class Asignar_Recibo extends React.Component {
             });
             swal("Ingrese el numero de recibo", "", "error");
         } else{
-            this.setState({
-                asignar: true,
-                tabla: true,
-                flag: true
-            });
+            for(var i in this.state.dataRecaudaciones){
+                if(this.state.rec === this.state.dataRecaudaciones[i].numero){;
+                    swal("Recibo encontrado", "", "success");
+                    this.setState({
+                        asignar: true,
+                        tabla: true,
+                        flag: true
+                    });
+                } else{
+                    swal("Recibo no existente", "", "error");
+                }
+            }
         }
     }
 
@@ -72,8 +81,65 @@ class Asignar_Recibo extends React.Component {
                                 <button className="waves-effect waves-light btn-large btn-center" type="submit" onClick={this.buscarRecibo}>
                                     Buscar <i className="large material-icons left">search</i>
                                 </button>
-                                {this.state.flag?(
-                                    <AR_buscarRecibo recibo={this.state.rec} asignar={this.state.asignar} tabla={this.state.tabla}/>
+                                {this.state.asignar?(
+                                    <div className="center datos">
+                                        <div>
+                                            <button className="waves-effect waves-light btn-large center" type="submit" onClick={this.formAlumno}>
+                                                Asignar a <i className="larga material-icons left">search</i>
+                                            </button>
+                                        </div>
+                                        <div>
+                                        {this.state.formulario?(
+                                            <div className="center datos">
+                                                <h4 className="center h4">
+                                                    <b>Buscar alumno</b>
+                                                </h4>
+                                                <div className="center datos">
+                                                    <input className="autocomplete" onChange={this.handleChangeDni} placeholder="DNI"></input>
+                                                    <input className="autoomplete" onChange={this.handleChangeCodigo} placeholder="Código"></input>
+                                                    <input className="autocomplete" onChange={this.handleChangeApePaterno} placeholder="Apellido paterno"></input>
+                                                    <input className="autocomplete" onChange={this.handleChangeApeMaterno} placeholder="Apellido Materno"></input>                                                
+                                                    <input className="autocomplete" onChange={this.handleChangeNombres} placeholder="Nombres"></input>
+                                                    <button className="waves-effect waves-light btn-large center" type="submit" onClick={this.buscarAlumno}>
+                                                        Buscar <i className="large material-icons left">search</i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ): (null)}
+                                        </div>
+                                    </div>
+                                ): (null)}
+
+                                {this.state.tabla?(
+                                    <div className="center datos">
+                                        <table className="table">
+                                            <thead>
+                                                <tr>
+                                                    <th className="th">Recibo</th>
+                                                    <th className="th">Código</th>
+                                                    <th className="th">Programa</th>
+                                                    <th className="th">Nombres</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td className="td"></td>
+                                                    <td className="td"></td>
+                                                    <td className="td"></td>
+                                                    <td className="td"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <button className="waves-effect waves-light btn-large center" type="submit">
+                                            Aceptar <i className="large material-icons left">check</i>
+                                        </button>
+                                        <button className="waves-effect waves-light btn-large center" type="submit">
+                                            Cancelar <i className="large material-icons left">cancel</i>
+                                        </button>
+                                        <button className="waves-effect waves-light btn-large center" type="submit">
+                                            Limpiar <i className="large material-icons left">brush</i>
+                                        </button>
+                                    </div>
                                 ): (null)}
                             </div>
                         </form>
@@ -88,6 +154,27 @@ class Asignar_Recibo extends React.Component {
                 </footer>
             </div>
         )
+    }
+
+    componentWillUpdate() {
+        //Json para buscar número de recio
+        //console.log("-----rec--------");
+        //console.log(this.state.rec);
+        fetch(CONFIG + 'recaudaciones/rec/' + this.state.rec)
+        .then((response) => {
+            return response.json();
+        })
+        .then((recaudaciones) =>{
+            this.setState({
+                dataRecaudaciones: recaudaciones
+            });
+            //console.log("----------DATA------");
+            //console.log(recaudaciones);
+            //console.log(this.state.dataRecaudaciones);
+        })
+        .catch((error) => {
+            console.error(error)
+        });
     }
 
 }

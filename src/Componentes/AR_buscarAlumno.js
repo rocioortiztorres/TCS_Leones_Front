@@ -7,7 +7,6 @@ class AR_buscarAlumno extends React.Component {
 
     constructor(props){
         super(props);
-        
         this.setState({
             dataAlumnos: []
         });
@@ -62,6 +61,7 @@ class AR_buscarAlumno extends React.Component {
                 dataAlumnos: alumnos
             });
             swal("Alumno encontrado", "", "success");
+            console.log("--------a------");
             console.log(alumnos);
             console.log(this.state.dataAlumnos);
         })
