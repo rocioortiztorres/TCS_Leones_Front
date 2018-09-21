@@ -10,12 +10,21 @@ class Asignar_Recibo extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            //variales para recaudaciones
+            //variales para booleanas
             asignar:false, //Variable para habilitar el botón asigar a
             tabla:false,  //Variable para habilitar la tabla
-            flag: false, //Variable para hacer una pausar y poder pasar el parámetro rec
-            rec: '', //Variable para la solicitud del recibo
-            dataRecaudaciones: []
+            //Variables para la búsqueda del número de recibo
+            rec: '', 
+            numRecibo: '',
+            dataRecaudaciones: [],
+            //Variables para la búsqueda del alumno
+            formulario: false,
+            dni: '', 
+            codigo: '', codAlum: '',
+            apePat: '', 
+            apeMat: '',
+            nombre: '', nomAlum: '',
+            dataAlumno: []
         };
 
         this.Regresar = this.Regresar.bind(this);
@@ -34,14 +43,19 @@ class Asignar_Recibo extends React.Component {
             swal("Ingrese el numero de recibo", "", "error");
         } else{
             for(var i in this.state.dataRecaudaciones){
-                if(this.state.rec === this.state.dataRecaudaciones[i].numero){;
+                if(this.state.rec == this.state.dataRecaudaciones[i].numero){
                     swal("Recibo encontrado", "", "success");
                     this.setState({
+                        numRecibo: this.state.dataRecaudaciones[i].numero,
                         asignar: true,
                         tabla: true,
                         flag: true
                     });
                 } else{
+                    this.setState({
+                        asignar: false,
+                        tabla: false
+                    });
                     swal("Recibo no existente", "", "error");
                 }
             }
@@ -54,6 +68,63 @@ class Asignar_Recibo extends React.Component {
         });
     }
 
+    //Métodos para buscar al alumno
+    formAlumno = (e) => {
+        e.preventDefault();
+        this.setState({
+            formulario: true
+        });
+    }
+
+    buscarAlumno = (e) =>{
+        e.preventDefault();
+        if(this.state.dni == '' && this.state.codigo == '' && this.state.apePat == '' && this.state.apeMat == '' && this.state.nombre == ''){
+            this.setState({
+                tabla: true,
+                asignar: true,
+                flag: false
+            })
+            swal("Ingrese un dato para buscar al alumno", "", "error");
+        } else{
+            this.setState({
+                tabla: false,
+                asignar: false,
+                flag: true
+            });
+        }
+    }
+
+    handleChangeDni = (e) => {
+        this.setState({
+            dni: e.target.value
+        });
+    }
+
+    handleChangeCodigo = (e) =>{
+        this.setState({
+            codigo: e.target.value
+        });
+    } 
+
+    handleChangeApePaterno = (e) =>{
+        this.setState({
+            apePat: e.target.value
+        });
+    }
+
+    handleChangeApeMaterno = (e) =>{
+        this.setState({
+            apeMat: e.target.apeMat
+        });
+    }
+
+    handleChangeNombres = (e) =>{
+        this.setState({
+            nombre: e.target.value
+        });
+    }
+
+    //Método para regresar a la página principal
     Regresar=(e)=>{
         browserHistory.push('/vista/loginNyA');
         e.preventDefault();
@@ -123,7 +194,7 @@ class Asignar_Recibo extends React.Component {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td className="td"></td>
+                                                    <td className="td">{this.state.numRecibo}</td>
                                                     <td className="td"></td>
                                                     <td className="td"></td>
                                                     <td className="td"></td>
@@ -158,8 +229,6 @@ class Asignar_Recibo extends React.Component {
 
     componentWillUpdate() {
         //Json para buscar número de recio
-        //console.log("-----rec--------");
-        //console.log(this.state.rec);
         fetch(CONFIG + 'recaudaciones/rec/' + this.state.rec)
         .then((response) => {
             return response.json();
@@ -168,9 +237,21 @@ class Asignar_Recibo extends React.Component {
             this.setState({
                 dataRecaudaciones: recaudaciones
             });
-            //console.log("----------DATA------");
-            //console.log(recaudaciones);
-            //console.log(this.state.dataRecaudaciones);
+        })
+        .catch((error) => {
+            console.error(error)
+        });
+
+        //Json para buscar número de recio
+        fetch(CONFIG + 'recaudaciones/rec/' + this.state.dni)
+        .then((response) => {
+            return response.json();
+        })
+        .then((recaudaciones) =>{
+            this.setState({
+                dataRecaudaciones: recaudaciones
+            });
+            swal("Recibo encontrado", "", "success");
         })
         .catch((error) => {
             console.error(error)
